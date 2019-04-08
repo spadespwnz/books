@@ -24,7 +24,7 @@ class TestSum(unittest.TestCase):
         """
         data = [Fraction(1,4), Fraction(1,4), Fraction(2,5)]
         result = sum(data)
-        self.assertEqual(result,10)
+        self.assertEqual(result,Fraction(9,10))
 
     def test_auto_pass(self):
         pass
