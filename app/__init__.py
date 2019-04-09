@@ -4,7 +4,7 @@ import os
 from dotenv import load_dotenv
 
 load_dotenv(".env")
-mongoUri = os.getenv("MONGO_DB_URI")
+mongoUri = os.getenv("MONGO_DB_URI") or "None"
 
 # from . import config_default
 # config = config_default.DevConfig
