@@ -1,0 +1,10 @@
+.banner {
+  display: flex;
+  justify-content: center;
+  height: 100px;
+  background: red;
+}
+
+.banner__content{
+  width: 700px;
+}
