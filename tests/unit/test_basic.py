@@ -1,15 +1,12 @@
 import unittest
-from app import app
+from app import create_app
+
 from fractions import Fraction
+from flask_pymongo import PyMongo
 from sum import sum
+from mockupdb import go, MockupDB, OpQuery
 
-class TestSum(unittest.TestCase):
-
-    def setUp(self):
-
-        self.app = app.test_client()
-        self.app.testing = True
-
+class TestOther(unittest.TestCase):
     def test_list_int(self):
         """
         Test that it can sum a list of integers
@@ -33,6 +30,15 @@ class TestSum(unittest.TestCase):
         with self.assertRaises(NameError):
             some_method()
 
+class TestDb(unittest.TestCase):
+    def setUp(self):
+        self.server = MockupDB(auto_ismaster={"maxWireVersion": 3})
+        self.server.run()
+        app = create_app("config_default.TestConfig",self.server.uri+"/test")
+        self.app = app.test_client()
+
+
+
     def test_home_status(self):
         result = self.app.get('/')
 
@@ -42,6 +48,16 @@ class TestSum(unittest.TestCase):
         attrs = vars(result)
 
         self.assertGreater(len(result.data),0,"Page Length Should not be 0")
+
+    def test_api_home(self):
+
+        future = go(self.app.get,"/api/")
+        request = self.server.receives(OpQuery)
+        request.reply({"test":"t"});
+        http_response = future()
+        print(http_response.get_data(as_text=True))
+        self.assertIn(b"Api",http_response.get_data())
+
 
 if __name__ == '__main__':
     unittest.main()
