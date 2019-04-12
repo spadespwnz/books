@@ -4,7 +4,19 @@
   height: 100px;
   background: red;
 }
-
+.banner--transparent{
+  background-color: transparent;
+}
 .banner__content{
+  display: flex;
+  justify-content: space-between;
+
   width: 700px;
+}
+
+.banner_left{
+  display: left;
+}
+.banner_right{
+  display: right;
 }
