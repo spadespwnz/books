@@ -24,3 +24,8 @@ class Messages:
         'msg':'Checking Email Valid',
         'code': 2.1
     }
+    message_register = {
+        'err':False,
+        'msg':"Registering Account",
+        'code': 3
+    }

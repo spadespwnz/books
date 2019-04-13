@@ -19,9 +19,9 @@ def create_app(config=None, db_uri=None):
 
     # app.config["DB"] = mongo
     from app.routes.page_routes import page_blueprint
-    from app.routes.api.api import api_blueprint
+    from app.routes.api.api import api_blueprint as user_api
 
-    flask_app.register_blueprint(api_blueprint, url_prefix="/api")
+    flask_app.register_blueprint(user_api, url_prefix="/api")
     flask_app.register_blueprint(page_blueprint)
     return flask_app
 

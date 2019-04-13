@@ -35,12 +35,16 @@ class User:
         return check_password_hash(self.password, pw)
 
     def create(self):
+        size = self.db.users.find( {"$or":[{"username":self.username},{"email":self.email}]}).limit(1).count(with_limit_and_skip=True)
+        if (size):
+            return False
         self.db.users.insert_one({
             '_id':ObjectId(),
             'username':self.username,
             'email':self.email,
             'password':self.password
         })
+        return True;
 
     @classmethod
     def exists(cls, db, query):
