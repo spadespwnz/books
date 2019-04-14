@@ -1,17 +1,18 @@
 from flask import Blueprint, jsonify, Response, request
 from flask import current_app as app
 from bson import json_util
+import jwt
 import json
 from app import mongo
+
 from app.models.User import User
 from app.Messages import Messages
 import re
-api_blueprint = Blueprint("user_api", __name__)
+api_blueprint = Blueprint("user_login_api", __name__)
 
 
 @api_blueprint.route("/", methods=["GET"])
 def api():
-
     for doc in mongo.db.books.find():
         print(doc)
         return_data = {
@@ -35,6 +36,7 @@ def api_test():
 
 @api_blueprint.route("/register", methods=["POST"])
 def api_register():
+    print(request.cookies.get('token'))
     req_data = request.get_json()
     username = req_data.get("username")
     email = req_data.get("email")
@@ -82,11 +84,19 @@ def api_register():
     userList = [json.dumps(doc, default=json_util.default) for doc in userListCursor]
     """
     #userList_string= dumps(userList)
-    print("Success")
-    print(user)
-    return_data['data'] = True
+    payload = {
+        'username':user.username,
+        'email':user.email
+    }
+    token = jwt.encode(payload, app.jwt_key).decode('utf-8')
+    return_data['data'] = {'success':True, 'token':token}
     resp = jsonify(return_data)
     resp.status_code = 200
+    secure_cookie = False
+    if (app.config.get("MODE") == "PROD"):
+        secure_cookie = True
+
+    resp.set_cookie("token",token,httponly=True, secure=secure_cookie)
     return resp
 
 #Returns True only if the email is not in the Database
