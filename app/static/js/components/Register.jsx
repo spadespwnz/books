@@ -22,7 +22,8 @@ export default class Register extends Component {
     this.verifyUsername = this.verifyUsername.bind(this);
     this.verifyEmail = this.verifyEmail.bind(this);
     this.verifyPassword = this.verifyPassword.bind(this);
-    this.drop = this.drop.bind(this);
+    this.test = this.test.bind(this);
+    this.test2 = this.test2.bind(this);
     this.passwordCheckTimeout = 0;
     this.emailCheckTimeout = 0;
     this.usernameCheckTimeout = 0;
@@ -32,8 +33,15 @@ export default class Register extends Component {
     return this.state.email.length > 0 && this.state.password.length > 0;
   }
 
-  drop(e){
-    API.get('/drop')
+  test(e){
+    API.get('/login')
+      .then(res =>{
+        console.log(res)
+      })
+  }
+
+  test2(e){
+    API.get('/logout')
       .then(res =>{
         console.log(res)
       })
@@ -149,7 +157,8 @@ export default class Register extends Component {
             </label>
           </div>
           <button type="submit" class="btn btn=primary">Sign Up</button>
-          <button type="button" class="btn btn=primary" onClick={this.drop}>Drop</button>
+          <button type="button" class="btn btn=primary" onClick={this.test}>Test</button>
+          <button type="button" class="btn btn=primary" onClick={this.test2}>Test2</button>
         </form>
       </div>
 

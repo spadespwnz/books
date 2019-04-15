@@ -34,9 +34,25 @@ def api_test():
 
     return resp
 
+@api_blueprint.route("/login", methods=["POST"])
+def api_login():
+    req_data = request.get_json()
+    username = req_data.get("email_or_username")
+    email = req_data.get("email_or_username")
+    password = req_data.get("password")
+    user = User(mongo.db, username = username, email = email, password = password)
+    validCreds = user.verify();
+    if not validCreds:
+        return_data = dict(Messages.message_login_fail)
+        resp = jsonify(return_data)
+        resp.status_code = 200
+        return resp
+
+    return sendToken(user,dict(Messages.message_login))
+
+
 @api_blueprint.route("/register", methods=["POST"])
 def api_register():
-    print(request.cookies.get('token'))
     req_data = request.get_json()
     username = req_data.get("username")
     email = req_data.get("email")
@@ -84,20 +100,8 @@ def api_register():
     userList = [json.dumps(doc, default=json_util.default) for doc in userListCursor]
     """
     #userList_string= dumps(userList)
-    payload = {
-        'username':user.username,
-        'email':user.email
-    }
-    token = jwt.encode(payload, app.jwt_key).decode('utf-8')
-    return_data['data'] = {'success':True, 'token':token}
-    resp = jsonify(return_data)
-    resp.status_code = 200
-    secure_cookie = False
-    if (app.config.get("MODE") == "PROD"):
-        secure_cookie = True
+    return sendToken(user, return_data)
 
-    resp.set_cookie("token",token,httponly=True, secure=secure_cookie)
-    return resp
 
 #Returns True only if the email is not in the Database
 @api_blueprint.route("/check_email_exist", methods=["POST"])
@@ -205,3 +209,18 @@ def valid_password_string(s):
     result = re.search("^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$", s)
     if (result == None): return False
     return True
+
+def sendToken(user, return_data):
+    payload = {
+        'username':user.username,
+        'email':user.email
+    }
+    token = jwt.encode(payload, app.jwt_key).decode('utf-8')
+    return_data['data'] = {'success':True, 'token':token}
+    resp = jsonify(return_data)
+    resp.status_code = 200
+    secure_cookie = False
+    if (app.config.get("MODE") == "PROD"):
+        secure_cookie = True
+    resp.set_cookie("token",token,httponly=True, secure=secure_cookie)
+    return resp

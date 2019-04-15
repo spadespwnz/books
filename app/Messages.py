@@ -29,3 +29,24 @@ class Messages:
         'msg':"Registering Account",
         'code': 3
     }
+    message_logout = {
+        'err':False,
+        'msg':"Logging out",
+        'code': 4
+    }
+    message_login = {
+        'err':False,
+        'msg':"Logging In",
+        'code':5
+    }
+    message_login_fail = {
+        'err':False,
+        'msg':"Invalid Login Credentials",
+        'code':5.1
+    }
+
+    error_invalid_token = {
+        'err':True,
+        'msg':"Invalid Token",
+        'code':2000
+    }
