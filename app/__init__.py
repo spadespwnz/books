@@ -9,9 +9,8 @@ mongo = PyMongo()
 def create_app(config=None, db_uri=None):
     load_dotenv(".env")
     mongoUri = db_uri or os.getenv("MONGO_DB_URI")
-    if (not os.getenv("JWT_SECRET")):
+    if not os.getenv("JWT_SECRET"):
         print("No JWT_SECRET ENV VARIABLE FOUND. USING DEFAULT, THIS IS UNSAFE")
-
 
     jwt_key = os.getenv("JWT_SECRET") or "somedefaultkey"
 
@@ -27,6 +26,7 @@ def create_app(config=None, db_uri=None):
     from app.routes.page_routes import page_blueprint
     from app.routes.api.api import api_blueprint as user_login_api
     from app.routes.api.user_api import api_blueprint as user_api
+
     flask_app.register_blueprint(user_login_api, url_prefix="/api")
     flask_app.register_blueprint(user_api, url_prefix="/api")
     flask_app.register_blueprint(page_blueprint)
