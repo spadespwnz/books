@@ -16,10 +16,11 @@ api_blueprint = Blueprint("user_api", __name__)
 @wrap.require_login_token
 def api_my_info(*args, **kwargs):
     return_data = dict(Messages.message_token_check)
-    return_data["data"] = {"username":kwargs["username"]}
+    return_data["data"] = {"username": kwargs["username"]}
     resp = jsonify(return_data)
     resp.status_code = 200
     return resp
+
 
 @api_blueprint.route("/logout", methods=["GET", "POST"])
 @wrap.require_login_token

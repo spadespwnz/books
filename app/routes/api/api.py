@@ -98,8 +98,6 @@ def api_register():
     return sendToken(user, return_data)
 
 
-
-
 # Returns True only if the email is not in the Database
 @api_blueprint.route("/check_email_exist", methods=["POST"])
 def api_check_email_exist():

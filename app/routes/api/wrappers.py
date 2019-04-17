@@ -4,6 +4,7 @@ from functools import wraps
 from app.Messages import Messages
 import jwt
 
+
 def require_login_token(func):
     @wraps(func)
     def check_token(*args, **kwargs):
