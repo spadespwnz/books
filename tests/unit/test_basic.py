@@ -56,7 +56,7 @@ class TestDb(unittest.TestCase):
         request.reply({"test":"t"});
         http_response = future()
         print(http_response.get_data(as_text=True))
-        self.assertIn(b"Api",http_response.get_data())
+        self.assertIn(b"api",http_response.get_data())
 
 
 if __name__ == '__main__':

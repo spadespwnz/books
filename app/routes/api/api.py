@@ -89,11 +89,8 @@ def api_register():
 
     """
     userListCursor = User.get_all(mongo.db)
-
     for doc in userList:
         print(doc)
-
-
     return_data = Messages.message_user_list
     userList = [json.dumps(doc, default=json_util.default) for doc in userListCursor]
     """

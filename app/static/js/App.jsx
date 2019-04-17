@@ -1,35 +1,59 @@
 import React, {Component} from 'react';
-import { BrowserRouter, Route, hashHistory } from 'react-router-dom';
+import { BrowserRouter, Route, Redirect, browserHistory, withRouter } from 'react-router-dom';
 import Home from './components/Home';
 import Clock from './components/Clock'
 import Banner from './components/Banner'
 import Login from './components/Login'
 import Register from './components/Register'
 import PageContent from './components/PageContent'
+import API from './api'
+import {UserContext} from './UserContext'
 
-const UserContext = React.createContext({
-  loggedIn: false,
-  name: "",
-  onLogout: () => true,
-});
-
-export const UserConsumer = UserContext.Consumer;
-const UserProvider = UserContext.Provider;
-
-export default class App extends Component{
+class App extends Component{
   constructor(props){
     super(props)
-    this.state = {};
+    this.state = {
+      toLogin: false,
+      loggedIn: false,
+      name: "",
+    };
 
+    this.handleLogin = this.handleLogin.bind(this)
     this.handleLogout = this.handleLogout.bind(this)
+    this.fetchUserData = this.fetchUserData.bind(this)
   };
+  componentDidMount(){
+    this.fetchUserData()
+  }
+
   handleLogout(){
-    console.log("Handling logout")
+    API.get('/logout')
+      .then(res => {
+        console.log(res)
+      })
+
+    this.setState({loggedIn: false})
+  }
+  handleLogin(){
+    this.props.history.push('/login')
+    this.setState({loggedIn: false, toLogin: true})
+  }
+  fetchUserData(){
+    API.get('/check_token')
+      .then(res => {
+
+        if (res.data.code==2000){
+          this.setState({loggedIn: false, name: ""})
+        }
+        if (res.data.code==6){
+
+          this.setState({loggedIn: true, name: res.data.data.username})
+        }
+      })
   }
   render(){
     return(
-      <BrowserRouter history={hashHistory}>
-        <UserProvider value={this.state.loggedIn, this.state.name, {onLogout: this.handleLogout}}>
+        <UserContext.Provider value={{ loggedIn:this.state.loggedIn, name:this.state.name,onLogout: this.handleLogout, onLogin: this.handleLogin, fetchUserData: this.fetchUserData}}>
           <div>
           <Route component={Banner} />
           {/*
@@ -43,8 +67,10 @@ export default class App extends Component{
             <Route path='/Register' component={Register} />
           </PageContent>
          </div>
-        </UserProvider>
-      </BrowserRouter>
+        </UserContext.Provider>
+
     )
   }
 };
+
+export default withRouter(App);

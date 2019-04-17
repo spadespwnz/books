@@ -1,6 +1,8 @@
 from flask import request, jsonify
+from flask import current_app as app
 from functools import wraps
 from app.Messages import Messages
+import jwt
 
 
 def require_login_token(func):
@@ -13,13 +15,20 @@ def require_login_token(func):
         if request.cookies:
             token = request.cookies.get("token")
         if token == None:
-            print("Invalid Token")
             return_data = dict(Messages.error_invalid_token)
             resp = jsonify(return_data)
             resp.status_code = 200
             return resp
 
-        kwargs["token"] = token
+        try:
+            data = jwt.decode(token, app.jwt_key)
+        except (ValueError, jwt.exceptions.DecodeError):
+            return_data = dict(Messages.error_invalid_token)
+            resp = jsonify(return_data)
+            resp.status_code = 200
+            return resp
+
+        kwargs["username"] = data["username"]
         return func(*args, **kwargs)
 
     return check_token
