@@ -3,6 +3,7 @@ from flask import current_app as app
 from bson import json_util
 import json
 from app import mongo
+from app import redis
 from app.models.User import User
 from app.Messages import Messages
 import re
@@ -25,6 +26,8 @@ def api_my_info(*args, **kwargs):
 @api_blueprint.route("/logout", methods=["GET", "POST"])
 @wrap.require_login_token
 def api_logout(*args, **kwargs):
+    redis.set(kwargs["token"], 1)
+    redis.expireat(kwargs["token"], kwargs["token_expire"])
     return_data = dict(Messages.message_logout)
     resp = jsonify(return_data)
     resp.set_cookie("token", "", expires=0)
