@@ -1,6 +1,7 @@
 from flask import Blueprint, jsonify, Response, request
 from flask import current_app as app
 from bson import json_util
+import datetime
 import jwt
 import json
 from app import mongo
@@ -219,7 +220,11 @@ def valid_password_string(s):
 
 
 def sendToken(user, return_data):
-    payload = {"username": user.username, "email": user.email}
+    payload = {
+        "username": user.username,
+        "email": user.email,
+        "exp": datetime.datetime.utcnow() + datetime.timedelta(seconds=20),
+    }
     token = jwt.encode(payload, app.jwt_key).decode("utf-8")
     return_data["data"] = {"success": True, "token": token}
     resp = jsonify(return_data)
