@@ -22,7 +22,19 @@ def api():
     resp.status_code = 200
 
     return resp
+@api_blueprint.route("/book", methods=["GET"])
+def book_api():
+    docs = mongo.db.editions.find()
+    userList = [json.dumps(doc, default=json_util.default) for doc in docs]
+    resp = jsonify(userList)
+    resp.status_code = 200
+    return resp
 
+@api_blueprint.route("/book/drop", methods=["GET"])
+def book_drop_api():
+    mongo.db.editions.drop()
+
+    return "DROPPED"
 
 @api_blueprint.route("/test", methods=["GET"])
 def api_test():

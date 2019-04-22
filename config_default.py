@@ -11,6 +11,8 @@ class ProdConfig(Config):
 class DevConfig(Config):
     MODE = "DEV"
     DEBUG = True
+    MONGO_URI='mongodb://localhost:27017/book_db'
+
 
 class TestConfig(Config):
     MODE = "TEST"
