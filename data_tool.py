@@ -44,9 +44,12 @@ def db_mod(data_type="EDITION"):
     if data_type == "AUTHOR":
         db.authors.create_index([("name",TEXT)])
         db.authors.create_index("key")
-    if data_type == "WORK" or data_type == "EDITION":
+    if data_type == "WORK":
         db.works.create_index([("title_cleaned",TEXT)])
         db.works.create_index("key")
+    if data_type == "EDITION":
+        db.editions.create_index([("title_cleaned",TEXT)])
+        db.editions.create_index("key")
 def upload(input, data_type="EDITION"):
     load_dotenv(".env")
     client = MongoClient(mongoUri)
@@ -181,15 +184,19 @@ def clean(input, output, data_type="EDITION"):
     print("Elapsed Seconds:")
     print(elapsed)
 if __name__ == "__main__":
-    if len(sys.argv) <= 1:
+    if len(sys.argv) <= 2:
+        print("Bad Arguements")
         exit()
     run_mode = sys.argv[1]
+    data_mode = sys.argv[2]
+    if not data_mode == "EDITION" and not data_mode == "WORK" and not data_mode == "AUTHOR":
+        print("Incorrect Data Type")
 
     inputFile = "A:/editions_cleaned.txt"
     outputFile = "A:/editions_cleaned.txt"
     if run_mode == "CLEAN":
-        clean(inputFile, outputFile)
+        clean(inputFile, outputFile, data_type=data_mode)
     if run_mode == "UPLOAD":
-        upload(inputFile)
+        upload(inputFile, data_type=data_mode)
     if run_mode == "MOD":
-        db_mod()
+        db_mod(data_type=data_mode)
