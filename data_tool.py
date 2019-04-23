@@ -4,7 +4,7 @@ import os
 import json
 import time
 from dotenv import load_dotenv
-from pymongo import MongoClient, TEXT
+from pymongo import MongoClient, TEXT, UpdateOne
 
 mongoUri = os.getenv("DATA_TOOL_URI")
 def progress(count, total, status=''):
@@ -44,9 +44,12 @@ def db_mod(data_type="EDITION"):
     if data_type == "AUTHOR":
         db.authors.create_index([("name",TEXT)])
         db.authors.create_index("key")
-    if data_type == "WORK" or data_type == "EDITION":
+    if data_type == "WORK":
         db.works.create_index([("title_cleaned",TEXT)])
         db.works.create_index("key")
+    if data_type == "EDITION":
+        db.editions.create_index([("title_cleaned",TEXT)])
+        db.editions.create_index("key")
 def upload(input, data_type="EDITION"):
     load_dotenv(".env")
     client = MongoClient(mongoUri)
@@ -82,17 +85,23 @@ def upload(input, data_type="EDITION"):
                     break
                 continue
             if data_type == "WORK" or data_type == "EDITION":
-                if 'title' in seg_json:
-                    cleaned_title = seg_json["title"]
-                    cleaned_title = cleaned_title.replace(".","")
-                    cleaned_title = cleaned_title.replace(","," ")
-                    cleaned_title = cleaned_title.replace("'","")
-                    cleaned_title = cleaned_title.replace("?","")
-                    cleaned_title = cleaned_title.replace("\"","")
-                    cleaned_title = cleaned_title.replace("(","")
-                    cleaned_title = cleaned_title.replace(")","")
-                    seg_json["title_cleaned"] = cleaned_title
-            bulk.append(seg_json)
+                if not 'title' in seg_json:
+                    continue
+            cleaned_title = seg_json["title"]
+            cleaned_title = cleaned_title.replace(".","")
+            cleaned_title = cleaned_title.replace(","," ")
+            cleaned_title = cleaned_title.replace("'","")
+            cleaned_title = cleaned_title.replace("?","")
+            cleaned_title = cleaned_title.replace("/"," ")
+            cleaned_title = cleaned_title.replace("\"","")
+            cleaned_title = cleaned_title.replace("(","")
+            cleaned_title = cleaned_title.replace(")","")
+            seg_json["title_cleaned"] = cleaned_title
+            if not 'authors' in seg_json:
+                seg_json["authors"] = []
+            if not 'subtitle' in seg_json:
+                seg_json["subtitle"] = ""
+            bulk.append(UpdateOne({"title":{"$regex":"/^"+seg_json["title"]+"$/i"},"subtitle":{"$regex":"/^"+seg_json["subtitle"]+"$/i"},"authors":seg_json["authors"]},seg_json, upsert=True))
             bulk_size += seg_size
             bulk_count += 1
             if MAX_UPLOAD:
@@ -137,7 +146,7 @@ def upload(input, data_type="EDITION"):
 def clean(input, output, data_type="EDITION"):
     author_elements = ["name", "personal_name", "birth_date","death_date", "key"]
     edition_elements = ["title","subtitle","key","isbn_10","isbn_13","number_of_pages","publish_date","authors","subjects"]
-    work_elements = ["title","key","author","authors"]
+    work_elements = ["title","key","authors"]
     total_size = os.path.getsize(input)
     size_read = 0
     lastPrinted = 0
@@ -181,15 +190,19 @@ def clean(input, output, data_type="EDITION"):
     print("Elapsed Seconds:")
     print(elapsed)
 if __name__ == "__main__":
-    if len(sys.argv) <= 1:
+    if len(sys.argv) <= 2:
+        print("Bad Arguements")
         exit()
     run_mode = sys.argv[1]
+    data_mode = sys.argv[2]
+    if not data_mode == "EDITION" and not data_mode == "WORK" and not data_mode == "AUTHOR":
+        print("Incorrect Data Type")
 
-    inputFile = "A:/editions_cleaned.txt"
+    inputFile = "A:/editions.txt"
     outputFile = "A:/editions_cleaned.txt"
     if run_mode == "CLEAN":
-        clean(inputFile, outputFile)
+        clean(inputFile, outputFile, data_type=data_mode)
     if run_mode == "UPLOAD":
-        upload(inputFile)
+        upload(inputFile, data_type=data_mode)
     if run_mode == "MOD":
-        db_mod()
+        db_mod(data_type=data_mode)

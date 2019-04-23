@@ -15,16 +15,18 @@ api_blueprint = Blueprint("user_login_api", __name__)
 
 @api_blueprint.route("/", methods=["GET"])
 def api():
+    return_data = {"api_version": app.config.get("VERSION")}
     for doc in mongo.db.books.find():
         print(doc)
-        return_data = {"api_version": app.config.get("VERSION")}
+
     resp = jsonify(return_data)
     resp.status_code = 200
 
     return resp
 @api_blueprint.route("/book", methods=["GET"])
 def book_api():
-    docs = mongo.db.editions.find()
+    query = { '$text': {'$search': "\"homo deus\"", '$caseSensitive': False, '$diacriticSensitive': False}}
+    docs = mongo.db.editions.find(query, {"publish_date": 1,"title": 1, "_id": 0}).limit(100)
     userList = [json.dumps(doc, default=json_util.default) for doc in docs]
     resp = jsonify(userList)
     resp.status_code = 200
