@@ -6,6 +6,7 @@ import Banner from './components/Banner'
 import Login from './components/Login'
 import Register from './components/Register'
 import PageContent from './components/PageContent'
+import SearchContent from './components/SearchContent'
 import API from './api'
 import {UserContext} from './UserContext'
 
@@ -62,9 +63,12 @@ class App extends Component{
           */}
 
           <PageContent path='/' component={PageContent}>
-            <Route exact path='/' component={Clock} />
-            <Route path='/login' component={Login} />
-            <Route path='/Register' component={Register} />
+            <div>
+              <Route exact path='/' component={Clock} />
+              <Route path='/book/search/:search_text' component={SearchContent} />
+              <Route path='/login' component={Login} />
+              <Route path='/Register' component={Register} />
+            </div>
           </PageContent>
          </div>
         </UserContext.Provider>
