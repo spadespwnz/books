@@ -49,27 +49,56 @@ def db_purge(data_type="EDITION"):
         coll = db.editions
     if data_type == "WORK":
         coll = db.works
+    '''
     pipeline = [
     {"$project":{
         "title":{"$toLower":["$title"]},
-        "subtitle":{"$toLower":["$subtitle"]},
+        "subtitle":{"$ifNull":[{"$toLower":["$subtitle"]},"__EMPTY__"]},
         "authors":"$authors"
     }},
     {"$group":{
-        "_id":{"title":"$title", "subtitle":"$subtitle","authors":"$authors"},
+        "_id":{"title":"$title"},
+        #{"$push":{"subtitle.$subtitle":{"$each":["$_id"]}}},
         "dups":{"$push":"$_id"},
         "count":{"$sum":1}
     }},
     {"$match":{
         "count":{"$gt":1}
     }},
-    {"$limit":100000},
+    ]
+
+    docs = coll.aggregate(pipeline,allowDiskUse=True)
+    for doc in docs:
+        print(doc)
+    '''
+
+
+
+
+    pipeline = [
+    {"$project":{
+        #"title":{"$toLower":["$title"]},
+        #"subtitle":{"$toLower":["$subtitle"]},
+        #"authors":"$authors"
+        "works":"$works"
+    }},
+    {"$group":{
+        #"_id":{"title":"$title", "subtitle":"$subtitle","authors":"$authors"},
+        "_id":{"works":"$works"},
+        "dups":{"$push":"$_id"},
+        "count":{"$sum":1}
+    }},
+    {"$match":{
+        "count":{"$gt":1}
+    }},
+    {"$limit":1000000},
     {"$project":{
         "_id":0,
         "dups":{"$slice":["$dups",1,{"$subtract":[{"$size":"$dups"},1]}]}
     }},
     {"$unwind":"$dups"}
     ]
+
     while True:
         docs = coll.aggregate(pipeline,allowDiskUse=True)
         result = []
@@ -81,6 +110,7 @@ def db_purge(data_type="EDITION"):
         print("Deleted")
         if len(result)==0:
             break
+
 def db_mod(data_type="EDITION"):
     load_dotenv(".env")
     client = MongoClient(mongoUri)
@@ -266,5 +296,9 @@ if __name__ == "__main__":
         load_dotenv(".env")
         client = MongoClient(mongoUri)
         db = client.book_db
+
+        #docs = db.editions.find({"works":{"$exists":True}})
+        #for doc in docs:
+        #    print(doc)
         count = db.editions.find().count()
         print("Doc Count:"+str(count))
