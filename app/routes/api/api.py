@@ -25,19 +25,64 @@ def api():
     return resp
 @api_blueprint.route("/book", methods=["GET"])
 def book_api():
-    query = { '$text': {'$search': "\"homo deus\"", '$caseSensitive': False, '$diacriticSensitive': False}}
-    docs = mongo.db.editions.find(query, {"publish_date": 1,"title": 1, "_id": 0}).limit(100)
+    #query = { '$text': {'$search': "\"homo deus\"", '$caseSensitive': False, '$diacriticSensitive': False}}
+    #docs = mongo.db.editions.find(query, {"publish_date": 1,"title": 1, "_id": 0}).limit(100)
+    docs = mongo.db.editions.find({},{"title":1,"_id":0,"subtitle":1}).limit(100)
     userList = [json.dumps(doc, default=json_util.default) for doc in docs]
     resp = jsonify(userList)
     resp.status_code = 200
     return resp
 
+@api_blueprint.route("/book/id/<id>", methods=["GET"])
+def book_id_api(id):
+    docs = mongo.db.editions.find({"_id":id})
+    bookList = [json.dumps(doc, default=json_util.default) for doc in docs]
+    resp = jsonify(bookList)
+    resp.status_code = 200
+    return resp
+
+@api_blueprint.route("/book/search/<title>", methods=["GET"])
+def book_search_api(title):
+    title = title.replace("_"," ")
+    title_len = len(title)
+    query = { '$text': {'$search': "\""+title+"\"", '$caseSensitive': False, '$diacriticSensitive': False}}
+    pipeline = [{"$match":query},
+                {"$addFields":{
+                    "subtitle":{
+                        "$cond":{
+                            "if":{
+                                "$ne":[{"$type":"$subtitle"},"string"]
+                            },
+                            "then": "",
+                            "else":"$subtitle"
+                        }
+                    }
+                }},
+                {"$project":{"_id":"$_id","title":"$title","score":{"$meta":"textScore"},
+                 "string_dif":{"$abs":{"$subtract":[{"$strLenCP":"$title"},title_len]}},
+                 "subtitle":"$subtitle","subtitle_len":{"$ifNull":[{"$strLenCP":"$subtitle"},"0"]},"authors":"$authors","key":"$_id"}},
+                # {"$group":{"_id":"$_id","score":{"$meta":"textScore"} }}
+                #{"$sort":{"score":{"$meta":"textScore"}}}]
+                {"$sort":{"string_dif":1, "subtitle_len":1}},
+                {"$limit":100}]
+
+    #docs = mongo.db.editions.find(query, {"score": {"$meta": "textScore"},"title": 1, "_id": 0}).limit(100).sort({"score":{"$meta":"textScore"}})
+    docs = mongo.db.editions.aggregate(pipeline)
+    result = []
+    for doc in docs:
+        result.append(doc)
+    print(len(result))
+    userList = [json.dumps(doc, default=json_util.default) for doc in result]
+    resp = jsonify(userList)
+    resp.status_code = 200
+    return resp
+'''
 @api_blueprint.route("/book/drop", methods=["GET"])
 def book_drop_api():
     mongo.db.editions.drop()
 
     return "DROPPED"
-
+'''
 @api_blueprint.route("/test", methods=["GET"])
 def api_test():
     return_data = {"test": "wtf", "somenum": 8}
