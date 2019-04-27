@@ -63,12 +63,12 @@ class App extends Component{
           */}
 
           <PageContent path='/' component={PageContent}>
-            <div>
+
               <Route exact path='/' component={Clock} />
               <Route path='/book/search/:search_text' component={SearchContent} />
               <Route path='/login' component={Login} />
               <Route path='/Register' component={Register} />
-            </div>
+
           </PageContent>
          </div>
         </UserContext.Provider>

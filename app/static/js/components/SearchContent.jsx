@@ -12,9 +12,9 @@ export default class SearchContent extends Component {
       }
     }
     componentDidMount(){
-
+    }
+    componentDidUpdate(){
       const { search_text } = this.props.match.params
-
       var books = []
       API.get(`/book/search/${search_text}`)
         .then(res => {
@@ -27,6 +27,12 @@ export default class SearchContent extends Component {
           }
           this.setState({bookList:books,search:search_text})
         })
+    }
+    shouldComponentUpdate(nextProps, nextState){
+      if (this.state.search == nextProps.match.params.search_text){
+        return false;
+      }
+      return true;
     }
     render(){
       return (

@@ -36,6 +36,7 @@ def create_app(config=None, db_uri=None):
     flask_app.register_blueprint(user_login_api, url_prefix="/api")
     flask_app.register_blueprint(user_api, url_prefix="/api")
     flask_app.register_blueprint(page_blueprint)
+    flask_app.config["host"]="0.0.0.0"
     return flask_app
 
 
