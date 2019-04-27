@@ -14,6 +14,7 @@ export default class Banner extends Component {
             <div className={styles.banner}>
               <div className={styles.banner__content}>
                 <div className={styles.banner_left}>
+                  <p>Alexandria</p>
                   { loggedIn && <h2>{name}</h2>}
                 </div>
                 <div className={styles.banner_right}>
@@ -23,8 +24,6 @@ export default class Banner extends Component {
                     ) : (
                       <button onClick={onLogin}>Login</button>
                     )}
-                    links
-                    <Link to="/login">Login</Link>
                   </div>
                   <SearchBar />
                 </div>
