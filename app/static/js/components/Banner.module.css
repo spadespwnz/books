@@ -2,7 +2,9 @@
   display: flex;
   justify-content: center;
   height: 100px;
-  background: red;
+  background: #222222;
+  color: #99BBDD;
+
 }
 .banner--transparent{
   background-color: transparent;
@@ -15,6 +17,10 @@
 }
 
 .banner_left{
+  margin-top: auto;
+  margin-bottom: auto;
+  height: 50%;
+  font-size: 200%;
   display: left;
 }
 .banner_right{

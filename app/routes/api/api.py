@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, Response, request
 from flask import current_app as app
-from bson import json_util
+from bson import json_util, ObjectId
 import datetime
 import jwt
 import json
@@ -35,7 +35,8 @@ def book_api():
 
 @api_blueprint.route("/book/id/<id>", methods=["GET"])
 def book_id_api(id):
-    docs = mongo.db.editions.find({"_id":id})
+    objectId = ObjectId(id)
+    docs = mongo.db.editions.find({"_id":objectId})
     bookList = [json.dumps(doc, default=json_util.default) for doc in docs]
     resp = jsonify(bookList)
     resp.status_code = 200
