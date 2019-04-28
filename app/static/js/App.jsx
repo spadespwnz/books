@@ -7,6 +7,7 @@ import Login from './components/Login'
 import Register from './components/Register'
 import PageContent from './components/PageContent'
 import SearchContent from './components/SearchContent'
+import BookContent from './components/BookContent'
 import API from './api'
 import {UserContext} from './UserContext'
 
@@ -66,6 +67,7 @@ class App extends Component{
 
               <Route exact path='/' component={Clock} />
               <Route path='/book/search/:search_text' component={SearchContent} />
+              <Route path='/book/id/:book_id' component={BookContent} />
               <Route path='/login' component={Login} />
               <Route path='/Register' component={Register} />
 
