@@ -26,5 +26,18 @@
 .banner_right{
   text-align: right;
   display: right;
+  font-size: 100%;
+}
+
+.banner_button_row{
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+}
+
+.banner_button_row__item{
+  margin: auto;
+  margin-left: 0;
+  margin-right: 10px;
 
 }
