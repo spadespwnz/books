@@ -1,7 +1,10 @@
 import React, { Component } from 'react';
 import API from '../api'
 import styles from './Register.module.css';
-export default class Register extends Component {
+import {Redirect } from 'react-router-dom';
+import {UserContext} from '../UserContext';
+
+class Register extends Component {
   constructor(props){
     super(props)
 
@@ -13,17 +16,18 @@ export default class Register extends Component {
       validUsername: null,
       validEmail: null,
       validPassword: null,
+      redirectToHome: false,
     };
     this.invalidUsernameReason = "";
     this.invalidEmailReason = "";
+
 
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
     this.verifyUsername = this.verifyUsername.bind(this);
     this.verifyEmail = this.verifyEmail.bind(this);
     this.verifyPassword = this.verifyPassword.bind(this);
-    this.test = this.test.bind(this);
-    this.test2 = this.test2.bind(this);
+
     this.passwordCheckTimeout = 0;
     this.emailCheckTimeout = 0;
     this.usernameCheckTimeout = 0;
@@ -33,19 +37,6 @@ export default class Register extends Component {
     return this.state.email.length > 0 && this.state.password.length > 0;
   }
 
-  test(e){
-    API.get('/login')
-      .then(res =>{
-        console.log(res)
-      })
-  }
-
-  test2(e){
-    API.get('/logout')
-      .then(res =>{
-        console.log(res)
-      })
-  }
   verifyPassword(e){
     const pattern = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/
     if (this.passwordCheckTimeout) clearTimeout(this.passwordCheckTimeout);
@@ -72,7 +63,7 @@ export default class Register extends Component {
       const data = {username, email,password};
       API.post('/check_valid_email',data)
         .then(res => {
-          console.log(res)
+
           this.setState({validEmail: res.data.data})
           this.invalidEmailReason = res.data.reason;
       })
@@ -111,12 +102,21 @@ export default class Register extends Component {
 
     API.post('/register',data)
       .then(res => {
-        console.log(res)
+        if (res.data.data.success){
+          this.context.fetchUserData();
+          this.setState({redirectToHome: true})
+
+
+        }else{
+          alert(res.data.reason);
+        }
       })
 
   }
   render() {
-
+    if (this.state.redirectToHome){
+      return <Redirect to='/' />
+    }
      return (
       <div className={styles.component}>
         <h1>Sign Up</h1>
@@ -157,11 +157,12 @@ export default class Register extends Component {
             </label>
           </div>
           <button type="submit" class="btn btn=primary">Sign Up</button>
-          <button type="button" class="btn btn=primary" onClick={this.test}>Test</button>
-          <button type="button" class="btn btn=primary" onClick={this.test2}>Test2</button>
         </form>
       </div>
 
      )
   }
 }
+
+Register.contextType = UserContext;
+export default Register;
