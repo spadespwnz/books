@@ -1,0 +1,38 @@
+.component{
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  margin-top: 50px;
+  max-width: 100%;
+}
+
+.side_column{
+  flex: 0 0 30%;
+  margin: 10px;
+}
+.side_column img{
+  width: 100%;
+}
+
+.main_column{
+  display: flex;
+  flex-flow: row wrap;
+  max-width: 100%;
+  margin: 10px;
+  flex: 0 0 70%;
+}
+.main_column__title{
+  width:100%;
+}
+.main_column__content{
+  width:100%;
+}
+.book_interact{
+  margin: 10px;
+  flex: 0 0 40%;
+}
+
+.book_info{
+  margin: 10px;
+  flex: 0 0 50%;
+}
