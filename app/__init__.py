@@ -32,9 +32,12 @@ def create_app(config=None, db_uri=None):
     from app.routes.page_routes import page_blueprint
     from app.routes.api.api import api_blueprint as user_login_api
     from app.routes.api.user_api import api_blueprint as user_api
-
+    from app.routes.api.book_api import api_blueprint as book_api
+    from app.routes.api.profile_api import api_blueprint as profile_api
     flask_app.register_blueprint(user_login_api, url_prefix="/api")
     flask_app.register_blueprint(user_api, url_prefix="/api")
+    flask_app.register_blueprint(book_api, url_prefix="/api/books")
+    flask_app.register_blueprint(profile_api, url_prefix="/api/profile")
     flask_app.register_blueprint(page_blueprint)
     flask_app.config["host"]="0.0.0.0"
     return flask_app
