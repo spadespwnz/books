@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import API from '../api'
 import {Redirect } from 'react-router-dom';
 import styles from './BookContent.module.css';
+import BookInteract from './BookInteract.jsx'
+
 export default class BookContent extends Component {
     constructor(props){
       super(props)
@@ -22,7 +24,7 @@ export default class BookContent extends Component {
         })
     }
     componentDidMount(){
-      //this.updateBookData()
+      this.updateBookData()
     }
     componentDidUpdate(){
       this.updateBookData()
@@ -63,13 +65,12 @@ export default class BookContent extends Component {
               Some Info
             </div>
             <div className={styles.book_interact}>
-              Some Interact
+              <BookInteract id={this.state.book_id}/>
             </div>
 
             <div className={styles.main_column__content}>
               Some stuff
             </div>
-            {items}
           </div>
         </div>
       )

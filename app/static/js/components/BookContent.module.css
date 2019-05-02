@@ -7,7 +7,7 @@
 }
 
 .side_column{
-  flex: 0 0 30%;
+  flex: 0 0 20%;
   margin: 10px;
 }
 .side_column img{
@@ -19,10 +19,13 @@
   flex-flow: row wrap;
   max-width: 100%;
   margin: 10px;
-  flex: 0 0 70%;
+  flex: 0 0 80%;
 }
 .main_column__title{
   width:100%;
+}
+.main_column__subtitle{
+
 }
 .main_column__content{
   width:100%;
