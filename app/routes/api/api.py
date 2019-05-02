@@ -72,7 +72,6 @@ def book_search_api(title):
     result = []
     for doc in docs:
         result.append(doc)
-    print(len(result))
     userList = [json.dumps(doc, default=json_util.default) for doc in result]
     resp = jsonify(userList)
     resp.status_code = 200
@@ -283,7 +282,7 @@ def sendToken(user, return_data):
     payload = {
         "username": user.username,
         "email": user.email,
-        "exp": datetime.datetime.utcnow() + datetime.timedelta(seconds=20),
+        "exp": datetime.datetime.utcnow() + datetime.timedelta(days=30),
     }
     token = jwt.encode(payload, app.jwt_key).decode("utf-8")
     return_data["data"] = {"success": True, "token": token}
